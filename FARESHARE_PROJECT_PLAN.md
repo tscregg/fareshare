@@ -1023,4 +1023,3 @@ The Stencil Punk aesthetic isn't aggressive — it's confident. The copy doesn't
 - A VC pitch deck
 - A Bolt press release
 - A wellness app
-- **Physical cards:** Mindmaps mention distributing physical cards — need a simple landing page or QR code
