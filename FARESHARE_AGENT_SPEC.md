@@ -11,11 +11,14 @@ Agent-first: build the Mastra agent as a standalone service, test via Mastra Pla
 | Layer | Technology |
 |-------|-----------|
 | Agent framework | Mastra 1.0 (`@mastra/core`) |
-| LLM | Anthropic Claude Sonnet |
+| LLM (primary) | Moonshot Kimi K2.5 (`moonshotai/kimi-k2.5`) — needs tool calling validation |
+| LLM (fallback) | Anthropic Claude Sonnet (`anthropic/claude-sonnet-4-20250514`) |
 | Database | Supabase (Postgres) |
 | Memory | Mastra Observational Memory (`@mastra/memory` + `@mastra/pg`) |
 | Deployment | Vercel (`@mastra/deployer-vercel`) |
 | Frontend (later) | Next.js + Vercel AI SDK |
+
+**LLM choice**: Kimi K2.5 is the preferred model (262K context, competitive pricing at $0.60/$3 per 1M tokens). Mastra lists it as a supported provider (`moonshotai/kimi-k2.5`) via OpenAI-compatible endpoint, but the Mastra model directory does not confirm tool calling support. Since FareShare depends on 7 tools, tool calling must be validated in Studio during Phase 1 before committing. If tool calling doesn't work reliably, fall back to Anthropic Claude Sonnet.
 
 ## Agent Design
 
@@ -147,6 +150,7 @@ Design decisions:
 ```
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
+MOONSHOT_API_KEY=
 ANTHROPIC_API_KEY=
 ```
 
@@ -219,12 +223,17 @@ export const fareshareAgent = new Agent({
   id: 'fareshare-agent',
   name: 'FareShare Agent',
   instructions,                          // from instructions/index.ts
-  model: 'anthropic/claude-sonnet-4-20250514',
+  model: [
+    { model: 'moonshotai/kimi-k2.5', maxRetries: 2 },
+    { model: 'anthropic/claude-sonnet-4-20250514', maxRetries: 2 },
+  ],
   tools: { searchRides, getRideDetails, postRide,
            searchRequests, postRequest,
            claimSeat, cancelSeat },
 })
 ```
+
+> **Note**: Model fallback is configured so that if Kimi K2.5 fails (rate limit, timeout, tool calling issues), requests automatically fall through to Claude Sonnet. During Phase 1 Studio testing, validate Kimi's tool calling reliability. If it works well, the fallback can be kept as insurance or removed.
 
 #### 1.4 — Mastra Instance
 
@@ -264,6 +273,15 @@ Run with `mastra dev --request-context-presets ./request-context-presets.json`
 | Cancel | toby | "Cancel my seat on the ride to Sintra" | Identifies ride, confirms, `cancel-seat` | Seat removed |
 | No results | toby | "Any rides to Porto?" | `search-rides` | No results, suggests posting request |
 | Portuguese | toby | "Preciso de boleia para Lisboa" | `search-rides` | Responds in Portuguese |
+
+**Model validation (first priority in 1.5):**
+
+Run the Search and Claim tests above with Kimi K2.5 as the sole model (temporarily remove fallback). Confirm:
+1. The model correctly invokes tools (not hallucinating tool responses)
+2. Tool input schemas are respected (correct parameter names and types)
+3. Multi-step flows work (search → user picks → claim requires two sequential tool calls)
+
+If any of these fail, switch primary model to `anthropic/claude-sonnet-4-20250514` and revisit Kimi in a future iteration.
 
 #### Dependency Order
 
