@@ -13,11 +13,11 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     'bg-accent text-bg font-heading text-[18px] tracking-[2px] uppercase py-4',
   outlined:
-    'bg-transparent text-text-primary font-heading text-[16px] tracking-[2px] uppercase border border-text-primary py-3.5',
+    'bg-transparent text-text-primary font-body text-[13px] font-medium border border-text-primary py-3.5',
   'outlined-accent':
-    'bg-transparent text-accent font-heading text-[14px] tracking-[1px] uppercase border border-accent py-2.5',
+    'bg-transparent text-accent font-body text-[12px] font-semibold tracking-[1px] uppercase border border-accent py-2.5',
   'danger-outlined':
-    'bg-transparent text-danger font-heading text-[16px] tracking-[2px] uppercase border border-danger py-3.5',
+    'bg-transparent text-danger font-body text-[13px] font-semibold border border-danger py-3.5',
 };
 
 export default function Button({

@@ -35,8 +35,8 @@ export default function BottomNav() {
                 className={isActive ? 'text-accent' : 'text-text-dim'}
               />
               <span
-                className={`text-[9px] font-medium uppercase tracking-[1px] ${
-                  isActive ? 'text-accent font-semibold' : 'text-text-dim'
+                className={`text-[9px] font-semibold uppercase tracking-[1px] ${
+                  isActive ? 'text-accent' : 'text-text-dim'
                 }`}
               >
                 {item.label}

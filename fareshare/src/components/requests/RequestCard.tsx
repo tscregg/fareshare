@@ -11,7 +11,7 @@ export default function RequestCard({ request }: RequestCardProps) {
   return (
     <Card>
       <div className="flex items-center justify-between mb-2">
-        <span className="font-heading text-[18px] tracking-[0.5px] text-text-primary">
+        <span className="text-[15px] font-bold tracking-[-0.3px] text-text-primary">
           {request.from.toUpperCase()} &rarr; {request.to.toUpperCase()}
         </span>
         <Badge variant="request">REQUEST</Badge>

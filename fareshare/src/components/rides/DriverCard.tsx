@@ -13,7 +13,7 @@ export default function DriverCard({ name, initials, ridesShared }: DriverCardPr
         Driver
       </p>
       <div className="flex items-center gap-3.5 border border-border px-4 py-3">
-        <Avatar initials={initials} size="md" variant="filled" />
+        <Avatar initials={initials} size="md" />
         <div>
           <p className="text-[15px] font-semibold text-text-primary">{name}</p>
           <p className="text-[12px] text-text-muted">{ridesShared} rides shared</p>
