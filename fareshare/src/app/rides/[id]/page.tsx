@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import MobileShell from '@/components/layout/MobileShell';
 import BackHeader from '@/components/layout/BackHeader';
 import RideDetailTop from '@/components/rides/RideDetailTop';
@@ -7,8 +8,13 @@ import SeatGrid from '@/components/rides/SeatGrid';
 import PassengerRow from '@/components/rides/PassengerRow';
 import DonationNudge from '@/components/rides/DonationNudge';
 import Button from '@/components/ui/Button';
-import { rides, currentUser } from '@/lib/mock-data';
-import { Pencil, Trash2 } from 'lucide-react';
+import ClaimSeatButton from '@/components/rides/ClaimSeatButton';
+import CancelSeatButton from '@/components/rides/CancelSeatButton';
+import DeleteRideButton from '@/components/rides/DeleteRideButton';
+import { getRideById } from '@/lib/actions/rides';
+import { mapRide } from '@/lib/mappers';
+import { createClient } from '@/lib/supabase/server';
+import { Pencil } from 'lucide-react';
 
 interface RideDetailPageProps {
   params: Promise<{ id: string }>;
@@ -16,11 +22,17 @@ interface RideDetailPageProps {
 
 export default async function RideDetailPage({ params }: RideDetailPageProps) {
   const { id } = await params;
-  const ride = rides.find((r) => r.id === id);
+  const rawRide = await getRideById(id);
 
-  if (!ride) return notFound();
+  if (!rawRide) return notFound();
 
-  const isDriver = ride.driverId === currentUser.id;
+  const ride = mapRide(rawRide);
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const isDriver = ride.driverId === user?.id;
+  const isPassenger = ride.passengers.some((p) => p.userId === user?.id);
   const emptySeats = ride.totalSeats - ride.filledSeats;
 
   return (
@@ -62,14 +74,23 @@ export default async function RideDetailPage({ params }: RideDetailPageProps) {
         <div className="flex flex-col gap-3">
           {isDriver ? (
             <>
-              <Button icon={Pencil}>EDIT RIDE</Button>
-              <Button variant="danger-outlined" icon={Trash2}>
-                DELETE RIDE
-              </Button>
+              <Link href={`/edit/ride/${ride.id}`}>
+                <Button icon={Pencil}>EDIT RIDE</Button>
+              </Link>
+              <DeleteRideButton rideId={ride.id} />
+            </>
+          ) : isPassenger ? (
+            <>
+              <CancelSeatButton rideId={ride.id} />
+              <Button variant="outlined">MESSAGE DRIVER</Button>
             </>
           ) : (
             <>
-              <Button>CLAIM A SEAT</Button>
+              {ride.status === 'open' ? (
+                <ClaimSeatButton rideId={ride.id} />
+              ) : (
+                <Button disabled>RIDE IS FULL</Button>
+              )}
               <Button variant="outlined">MESSAGE DRIVER</Button>
               <DonationNudge
                 text={`Recommended donation: ~\u20AC${ride.donation} per seat`}

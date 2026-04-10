@@ -17,11 +17,12 @@ const TIMES = [
 
 interface TimePickerProps {
   label: string;
+  name?: string;
   defaultValue?: string;
   onChange?: (time: string) => void;
 }
 
-export default function TimePicker({ label, defaultValue, onChange }: TimePickerProps) {
+export default function TimePicker({ label, name, defaultValue, onChange }: TimePickerProps) {
   const [selected, setSelected] = useState<string | undefined>(defaultValue);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -57,6 +58,10 @@ export default function TimePicker({ label, defaultValue, onChange }: TimePicker
         </span>
         <Clock size={16} className="text-text-dim" />
       </button>
+
+      {name && (
+        <input type="hidden" name={name} value={selected || ''} />
+      )}
 
       {open && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 border border-border bg-bg-card max-h-[240px] overflow-y-auto">

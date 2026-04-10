@@ -7,11 +7,12 @@ import { CalendarDays } from 'lucide-react';
 
 interface DatePickerProps {
   label: string;
+  name?: string;
   defaultValue?: Date;
   onChange?: (date: Date | undefined) => void;
 }
 
-export default function DatePicker({ label, defaultValue, onChange }: DatePickerProps) {
+export default function DatePicker({ label, name, defaultValue, onChange }: DatePickerProps) {
   const [selected, setSelected] = useState<Date | undefined>(defaultValue);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -76,6 +77,13 @@ export default function DatePicker({ label, defaultValue, onChange }: DatePicker
             }}
           />
         </div>
+      )}
+      {name && (
+        <input
+          type="hidden"
+          name={name}
+          value={selected ? format(selected, 'yyyy-MM-dd') : ''}
+        />
       )}
     </div>
   );
