@@ -12,6 +12,8 @@ const variantStyles: Record<BadgeVariant, string> = {
   confirmed: 'text-accent bg-accent-muted',
   pending: 'text-accent bg-accent-muted',
   request: 'text-accent bg-accent-muted',
+  cancelled: 'text-danger bg-danger/10',
+  completed: 'text-text-dim bg-bg-hover',
 };
 
 export default function Badge({ variant, children }: BadgeProps) {

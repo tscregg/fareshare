@@ -1,5 +1,5 @@
-export type RideStatus = 'open' | 'full';
-export type BadgeVariant = 'open' | 'full' | 'confirmed' | 'pending' | 'request';
+export type RideStatus = 'open' | 'full' | 'cancelled' | 'completed';
+export type BadgeVariant = 'open' | 'full' | 'confirmed' | 'pending' | 'request' | 'cancelled' | 'completed';
 
 export interface User {
   id: string;
